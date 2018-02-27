@@ -4,6 +4,7 @@ const die           = require('die')
 
 const config        = require('./config/config.json')
 const sequelize     = require('./lib/sequelize')
+const currencies    = require('./lib/currencies')
 
 const repoRoutes = require('./routes/repo')
 
@@ -31,6 +32,11 @@ app.use(function(req, res, next) {
 });
 
 app.use('/repos', repoRoutes);
+
+app.get('/currencies', (req, res) => {
+  res.send(currencies)
+})
+
 
 app.get('/', (req, res) => {
   res.send('Running.')

@@ -12,20 +12,19 @@ function svg (req, res, next) {
   next()
 }
 
-
 router.get('/', function(req, res) {
   res.send('Repos home page');
 });
 
-router.get('/:org/:repo.json', function(req, res) {
+router.get('/:owner/:repo.json', function(req, res) {
   request
-    .get('https://api.github.com/repos/' + req.params.org + '/' + req.params.repo)
+    .get('https://api.github.com/repos/' + req.params.owner + '/' + req.params.repo)
     .set('Content-Type', 'application/json')
     .set('Accept', 'application/vnd.github.v3+json')
     .end((err, resp) => {
       if (resp.status == 200) {
         const ghRepo = JSON.parse(resp.text)
-        repoUtil.findByName(req.params.org, req.params.repo).then((repo) => {
+        repoUtil.findByName(req.params.owner, req.params.repo).then((repo) => {
           res.set('Content-Type', 'application/json')
           res.status(200).send(JSON.stringify({
             readme: repo,
@@ -40,8 +39,8 @@ router.get('/:org/:repo.json', function(req, res) {
 })
 
 
-router.post('/:org/:repo/donate', function(req, res) {
-  repoUtil.findByName(req.params.org, req.params.repo).then((repo) => {
+router.post('/:owner/:repo/donate', function(req, res) {
+  repoUtil.findByName(req.params.owner, req.params.repo).then((repo) => {
     if (!repo) {
       return res.status(400).send('Repo not found')
     }
@@ -58,7 +57,7 @@ router.post('/:org/:repo/donate', function(req, res) {
   })
 });
 
-router.get('/:org/:repo/donations/preview', svg, function(req, res) {
+router.get('/:owner/:repo/donations/preview', svg, function(req, res) {
   const preview = Donation.build(req.query)
   badge({
     text: [preview.getFrom(), preview.getAmount()]
@@ -67,8 +66,8 @@ router.get('/:org/:repo/donations/preview', svg, function(req, res) {
   })
 })
 
-router.get('/:org/:repo/donations/latest/:num?', svg, function(req, res) {
-  repoUtil.findByName(req.params.org, req.params.repo).then((repo) => {
+router.get('/:owner/:repo/donations/latest/:num?', svg, function(req, res) {
+  repoUtil.findByName(req.params.owner, req.params.repo).then((repo) => {
     repo.latestDonation(req.params.num).then((donation) => {
       donation.badge().then(svg => {
         res.send(svg)
@@ -79,8 +78,8 @@ router.get('/:org/:repo/donations/latest/:num?', svg, function(req, res) {
   })
 });
 
-router.get('/:org/:repo/donations/top/:num?', svg, function(req, res) {
-  repoUtil.findByName(req.params.org, req.params.repo).then((repo) => {
+router.get('/:owner/:repo/donations/top/:num?', svg, function(req, res) {
+  repoUtil.findByName(req.params.owner, req.params.repo).then((repo) => {
     repo.topDonation(req.params.num).then((donation) => {
       donation.badge().then(svg => {
         res.send(svg)
@@ -93,7 +92,7 @@ router.get('/:org/:repo/donations/top/:num?', svg, function(req, res) {
 
 router.get('/:id', function(req, res) {
   Repo.findById(req.params.id).then((repo) => {
-    res.send(repo.org + '/' + repo.name)
+    res.send(repo.owner + '/' + repo.name)
   })
 });
 

@@ -3,7 +3,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('repos', [{
-      org: 'vindexus',
+      owner: 'vindexus',
       name: 'nano-shopify'
     }], {});
 

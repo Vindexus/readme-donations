@@ -3,7 +3,7 @@ const sequelize = require('../lib/sequelize')
 const Donation = require('./Donation')
 
 let Repo = sequelize.define('repos', {
-  org: {
+  owner: {
     type: Sequelize.STRING
   },
   name: {
@@ -12,7 +12,7 @@ let Repo = sequelize.define('repos', {
 })
 
 Repo.prototype.toString = function () {
-  return this.org + '/' + this.name
+  return this.owner + '/' + this.name
 }
 
 Repo.prototype.donate = function (amount, currency, frm, done) {
