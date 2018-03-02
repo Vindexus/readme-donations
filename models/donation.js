@@ -6,25 +6,31 @@ const badge      = require('../lib/badge')
 
 const Donation = sequelize.define('donation', {
   from: Sequelize.STRING,
-  amount: Sequelize.DOUBLE(11, 12),
-  currency: {
+  enteredAmount: Sequelize.DOUBLE,
+  enteredCurrency: Sequelize.STRING,
+  receivedAmount: Sequelize.DOUBLE,
+  receivedCurrency: {
     type: Sequelize.ENUM,
-    values: ['nano', 'btc']
+    values: ['nano']
   },
+  receivingAddress: Sequelize.STRING,
+  usdValue: Sequelize.DOUBLE,
   repoId: {
    type: Sequelize.INTEGER,
 
    references: {
-     // This is a reference to another model
      model: Repo,
-
-     // This is the column name of the referenced model
      key: 'id',
-
-     // This declares when to check the foreign key constraint. PostgreSQL only.
      deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
    }
  }
+}, {
+  hooks: {
+    beforeCreate: function (donation, options) {
+      console.log('donation.from',donation.from);
+      donation.from = donation.from.trim()
+    }
+  }
 })
 
 Donation.prototype.getFrom = function () {
@@ -32,8 +38,8 @@ Donation.prototype.getFrom = function () {
 }
 
 Donation.prototype.getAmount = function () {
-  const curr = currencies[this.dataValues.currency]
-  return (curr.prefix || "") + this.dataValues.amount + ' ' + curr.ticker
+  const curr = currencies[this.dataValues.enteredCurrency]
+  return (curr.prefix || "") + this.dataValues.enteredAmount + ' ' + curr.ticker
 }
 
 Donation.prototype.badge = function () {

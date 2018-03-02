@@ -38,29 +38,36 @@ router.get('/:owner/:repo.json', function(req, res) {
     })
 })
 
-
 router.post('/:owner/:repo/donate', function(req, res) {
-  repoUtil.findByName(req.params.owner, req.params.repo).then((repo) => {
-    if (!repo) {
-      return res.status(400).send('Repo not found')
-    }
-    let confirmed = false
-    if (!confirmed) {
-      res.status(500).send({error: 'Could not confirm'})
-    }
-    repo.donate(req.body.amount, req.body.currency, req.body.from).then((donation) => {
-      res.send({donation: donation})
+  repoUtil.findByName(req.params.owner, req.params.repo)
+    .then((repo) => {
+      if (!repo) {
+        return res.status(400).send('Repo not found')
+      }
+
+      return brainblocks.get(req.body.token).then((data) => {
+        return repo.donate({
+          enteredAmount: data.amount,
+          enteredCurrency: data.currency,
+          receivedCurrency: 'nano',
+          receivedAmount: data.amount_rai,
+          receivingAddress: data.destination,
+          from: req.body.from
+        })
+      })
+    })
+    .then((donation) => {
+      res.status(200).send({donation: donation})
     })
     .catch((err) => {
       res.send({error: err}).status(500)
     })
-  })
 });
 
 router.get('/:owner/:repo/donations/preview', svg, function(req, res) {
   const preview = Donation.build(req.query)
   badge({
-    text: [preview.getFrom(), preview.getAmount()]
+    text: [preview.getFrom(), '   $0.10 USD || 0.0087425 BTC  ']
   }).then(svg => {
     res.send(svg)
   })

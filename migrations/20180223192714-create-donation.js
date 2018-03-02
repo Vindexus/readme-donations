@@ -9,11 +9,15 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       from: Sequelize.STRING,
-      amount: Sequelize.DOUBLE,
-      currency: {
+      enteredAmount: Sequelize.DOUBLE,
+      enteredCurrency: Sequelize.STRING,
+      receivedAmount: Sequelize.DOUBLE,
+      receivedCurrency: {
         type: Sequelize.ENUM,
-        values: ['nano', 'btc']
+        values: ['nano']
       },
+      receivingAddress: Sequelize.STRING,
+      usdValue: Sequelize.DOUBLE,
       repoId: {
         type: Sequelize.INTEGER,
         references: { model: 'repos', key: 'id' }

@@ -15,12 +15,14 @@ Repo.prototype.toString = function () {
   return this.owner + '/' + this.name
 }
 
-Repo.prototype.donate = function (amount, currency, frm, done) {
+Repo.prototype.donate = function (data, done) {
   return Donation.create({
     repoId: this.dataValues.id,
-    amount: amount,
-    currency: currency,
-    from: frm
+    enteredAmount: data.enteredAmount,
+    enteredCurrency: data.enteredCurrency,
+    receivedAmount: data.receivedAmount,
+    receivedCurrency: data.receivedCurrency,
+    from: data.from
   })
 }
 
@@ -51,7 +53,9 @@ Repo.prototype.topDonation = function (num) {
     where: {
       repoId: this.dataValues.id
     },
-    order: [['amount', 'DESC']],
+    //This assumes all donations are received in the same currency
+    //If that ever changes this sort will be obsolete
+    order: [['receivedAmount', 'DESC']],
     limit: num,
     offset: num - 1
   }).then((donations) => {
