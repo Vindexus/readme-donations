@@ -1,3 +1,4 @@
 {
-"destination": "colin"
+  "destination": "colin",
+  "defaultSplit": "60/40"
 }
